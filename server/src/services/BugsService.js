@@ -1,6 +1,10 @@
 import { dbContext } from "../db/DbContext"
 
 class BugsService {
+  async getBugById(bugId) {
+    const bug = await dbContext.Bugs.findById(bugId).populate('creator', 'name picture')
+    return bug
+  }
   async getAllBugs() {
     const bugs = await dbContext.Bugs.find().populate('creator')
     return bugs
