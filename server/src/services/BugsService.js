@@ -11,17 +11,15 @@ class BugsService {
 
     return 'Bug has been exterminated'
   }
-  async editBug(bugId, userInfo, updateData) {
+  async editBug(bugId, userId, updateData) {
     const originalBug = await dbContext.Bugs.findById(bugId)
-
-    if (!originalBug) { throw new Error(`Invalid bug id: ${bugId}`) }
-    if (userInfo != updateData.creatorId) { throw new Forbidden("NOT ROUND HERE PARTNER, NOT ROUND HERE") }
-
-    // if (updateData.description)
-    originalBug.description ??= updateData.description
+    if (!originalBug) { throw new Error(`NO BUGS FOR YOU, ${bugId}`) }
+    if (userId != originalBug.creatorId) {
+      throw new Forbidden('You cant update that you dont own it')
+    }
+    if (updateData.description) originalBug.description = updateData.description
     originalBug.closed ??= updateData.closed
-    originalBug.title ??= updateData.title
-
+    originalBug.title = updateData.title || originalBug.title
     await originalBug.save()
     return originalBug
   }
@@ -36,6 +34,7 @@ class BugsService {
   async createBug(bugData) {
     const bug = await dbContext.Bugs.create(bugData)
     await bug.populate('creator', 'name picture')
+    // if (bugData.priority) { throw new Error('Invalid priority') }
     return bug
   }
 
