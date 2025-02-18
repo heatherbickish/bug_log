@@ -1,6 +1,10 @@
 import { dbContext } from "../db/DbContext"
 
 class TrackedBugsService {
+  async getMyTrackedBugs(userInfo) {
+    const trackedBugs = await dbContext.TrackedBugs.find({ accountId: userInfo }).populate('bug')
+    return trackedBugs
+  }
   async getTrackedBugsUser(bugId) {
     const trackedBugs = await dbContext.TrackedBugs.find({ bugId: bugId }).populate('tracker', 'name picture')
     return trackedBugs
