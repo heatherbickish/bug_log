@@ -1,6 +1,16 @@
 import { dbContext } from "../db/DbContext"
+import { Forbidden } from "../utils/Errors"
 
 class TrackedBugsService {
+  async deleteTrackedBug(trackedBugId, userId) {
+    const trackedBug = await dbContext.TrackedBugs.findById(trackedBugId)
+
+    if (trackedBug == null) { throw new Error(`Invalid tracked bug id: ${trackedBugId}`) }
+    if (userId != trackedBug.accountId) { throw new Forbidden("DONT BELONG TO YOU GET OUTTA HERE") }
+
+    await trackedBug.deleteOne()
+    return trackedBug
+  }
   async getMyTrackedBugs(userInfo) {
     const trackedBugs = await dbContext.TrackedBugs.find({ accountId: userInfo }).populate('bug')
     return trackedBugs
